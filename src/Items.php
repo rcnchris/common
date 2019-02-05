@@ -5,15 +5,15 @@
  *
  * PHP version 5
  *
- * @category New
+ * @category Collection
  *
- * @package Rcnchris\Common
+ * @package  Rcnchris\Common
  *
- * @author Raoul <rcn.chris@gmail.com>
+ * @author   Raoul <rcn.chris@gmail.com>
  *
- * @license https://github.com/rcnchris GPL
+ * @license  https://github.com/rcnchris GPL
  *
- * @link https://github.com/rcnchris On Github
+ * @link     https://github.com/rcnchris On Github
  */
 
 namespace Rcnchris\Common;
@@ -25,18 +25,21 @@ use IteratorAggregate;
 
 /**
  * Class Items
+ * <ul>
+ * <li>Gestion d'une liste de données</li>
+ * </ul>
  *
- * @category New
+ * @category Collection
  *
- * @package Rcnchris\Common
+ * @package  Rcnchris\Common
  *
- * @author Raoul <rcn.chris@gmail.com>
+ * @author   Raoul <rcn.chris@gmail.com>
  *
- * @license https://github.com/rcnchris GPL
+ * @license  https://github.com/rcnchris GPL
  *
- * @version Release: <1.0.0>
+ * @version  Release: <1.0.0>
  *
- * @link https://github.com/rcnchris on Github
+ * @link     https://github.com/rcnchris on Github
  */
 class Items implements ArrayAccess, Countable, IteratorAggregate
 {
@@ -498,7 +501,7 @@ class Items implements ArrayAccess, Countable, IteratorAggregate
      * ### Example
      * - `$items->merge(['Vert', 'Rouge', 'Bleu']);`
      *
-     * @param array $array Tableau à fusionner avec les items
+     * @param array     $array  Tableau à fusionner avec les items
      *
      * @param bool|null $recurs Ajoute les valeurs avec des clés identiques
      *

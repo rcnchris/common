@@ -71,4 +71,10 @@ class TextTest extends BaseTestCase
         $result = '<code><span style="color: #000000"><span style="color: #0000BB">&lt;?php&nbsp;phpinfo</span><span style="color: #007700">();&nbsp;</span><span style="color: #0000BB">?&gt;</span></span></code>';
         $this->assertSimilar($result, Text::showPhpSource($source));
     }
+
+    public function testMarkdown()
+    {
+        $result = Text::markdown('# Ola les gens');
+        $this->assertSimilar('<h1>Ola les gens</h1>', $result);
+    }
 }

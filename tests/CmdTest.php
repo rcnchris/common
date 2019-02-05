@@ -5,98 +5,94 @@ use Tests\Rcnchris\Common\BaseTestCase;
 class CmdTest extends BaseTestCase
 {
     /**
-     * @var Cmd
-     */
-    private $cmd;
-
-    public function setUp()
-    {
-        $this->cmd = $this->makeStaticCmd();
-    }
-
-    /**
      * Obtenir une instance de Cmd
      *
-     * @return Cmd
+     * @param string|null $commands Commande shell à exécuter
+     *
+     * @return \Rcnchris\Common\Cmd
      */
-    public function makeStaticCmd()
+    public function makeCmd($commands = null)
     {
-        return Cmd::getInstance();
-    }
-
-    /**
-     * @return Cmd
-     */
-    public function makeCmd()
-    {
-        return new Cmd();
+        return new Cmd($commands);
     }
 
     public function testInstance()
     {
         $this->ekoTitre('Common - Shell');
-        $this->assertInstanceOf(Cmd::class, Cmd::getInstance());
         $this->assertInstanceOf(Cmd::class, new Cmd());
     }
 
     public function testHelp()
     {
-        $o = $this->makeStaticCmd();
+        $o = $this->makeCmd();
         $this->assertHasHelp($o);
     }
 
-    public function testExec()
+    public function testAddOneCommandOnInstance()
     {
-        $path = $this->rootPath();
-        $cmd = $this->makeStaticCmd();
-        $ret = $cmd->exec("cd $path && ls");
-        $this->assertCount(1, $cmd->getCmds());
-        $this->assertCount(1, $cmd->getCmds(true));
-        $this->assertArrayHasKey('cmd', $cmd->getCmds()[0]);
-        $this->assertArrayHasKey('time', $cmd->getCmds()[0]);
-        $this->assertArrayHasKey('result', $cmd->getCmds()[0]);
-        $this->assertArrayHasKey('ret', $cmd->getCmds()[0]);
+        $cmd = $this->makeCmd('pwd');
+        $this->assertEquals('pwd', $cmd->getCommands());
+    }
 
-        $this->assertContains('composer.json', $cmd->getCmds(true)[0]);
+    public function testAddOneCommand()
+    {
+        $cmd = $this->makeCmd()->add('pwd');
+        $this->assertEquals('pwd', $cmd->getCommands());
+    }
+
+    public function testAddNCommand()
+    {
+        $cmd = $this->makeCmd()->add('cd .. && ls -lAF');
+        $this->assertInternalType('array', $cmd->getCommands());
+        $this->assertCount(2, $cmd->getCommands());
+    }
+
+    public function testExecOneCommandOneLine()
+    {
+        $result = $this->makeCmd()->add('pwd')->exec();
+        $this->assertInternalType('string', $result);
+    }
+
+    public function testExecOneCommandNLines()
+    {
+        $result = $this->makeCmd()->add('ls -lAF')->exec();
+        $this->assertInternalType('array', $result);
+    }
+
+    public function testExecNCommands()
+    {
+        $result = $this->makeCmd()->add('cd .. && pwd && ls -lAF')->exec();
+        $this->assertInternalType('array', $result);
+        $this->assertCount(3, $result);
+    }
+
+    public function testExecOneCommandWithInfosInResult()
+    {
+        $result = $this
+            ->makeCmd()
+            ->add('ls -lAF')
+            ->exec(true);
+        $this->assertInternalType('array', $result);
+        $this->assertArrayHasKeys(['cmd', 'result', 'time', 'ret'], $result);
+    }
+
+    public function testExecNCommandsWithInfosInResult()
+    {
+        $result = $this
+            ->makeCmd()
+            ->add('cd .. && pwd && ls -lAF')
+            ->exec(true);
+        $this->assertInternalType('array', $result);
+        $this->assertCount(3, $result);
+        foreach ($result as $r) {
+            $this->assertArrayHasKeys(['cmd', 'result', 'time', 'ret'], $r);
+        }
     }
 
     public function testExecWrongCommand()
     {
-        ob_start();
-        $c = $this->makeStaticCmd();
-        $c->exec('lll');
-        $this->assertEquals(1, count($c->getCmds()));
-        $this->assertArrayHasKey('cmd', $c->getCmds()[0]);
-        $content = ob_get_clean();
-    }
-
-    public function testExecMultipleCommands()
-    {
-        $this->assertInternalType('array', Cmd::exec('ls && pwd'));
-    }
-
-    public function testExecMultipleCommandsSeparate()
-    {
-        $path = dirname(__DIR__);
-        $c = $this->makeStaticCmd();
-        $ret = $c->exec("cd $path && ls", true);
-        $this->assertEquals(2, count($c->getCmds()));
-        $this->assertEquals(2, count($c->getCmds(true)));
-    }
-
-    public function testGetCommands()
-    {
-        $this->cmd->exec('ls && pwd');
-        $this->assertNotEmpty($this->cmd->getCmds());
-    }
-
-    public function testGetGitVersion()
-    {
-        $this->assertInternalType('string', $this->cmd->git());
-    }
-
-    public function testGetSizeWithDir()
-    {
-        $this->assertEquals('git version', substr($this->makeStaticCmd()->git(), 0, 11));
+        $result = $this->makeCmd('lll')->exec();
+        $this->assertInternalType('string', $result);
+        $this->assertContains('not found', $result);
     }
 }

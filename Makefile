@@ -45,7 +45,7 @@ codecs: ## Tests syntaxiques
 
 code: codecbf codecs ## Vérification complète du code source
 
-doc: ## Générer la documentation des sources
+doc: code ## Générer la documentation des sources
 	@echo -e '$(colorCom)Générer la documentation des sources$(colorOff)'
 	@/home/dev/www/devtools/phpdoc/./vendor/bin/phpdoc -d $(root)/src -t $(root)/public/doc --template="responsive"
 

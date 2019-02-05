@@ -5,7 +5,7 @@
  *
  * PHP version 5
  *
- * @category New
+ * @category Dossier
  *
  * @package  Rcnchris\Common
  *
@@ -18,10 +18,13 @@
 
 namespace Rcnchris\Common;
 
-use SplFileInfo;
+use Countable;
 
 /**
  * Class Folder
+ * <ul>
+ * <li>Facilite la manipulation des dossiers</li>
+ * </ul>
  *
  * @category Folder
  *
@@ -35,7 +38,7 @@ use SplFileInfo;
  *
  * @link     https://github.com/rcnchris on Github
  */
-class Folder
+class Folder implements Countable
 {
     /**
      * Aide de cette classe
@@ -43,7 +46,7 @@ class Folder
      * @var array
      */
     private static $help = [
-        "Facilite la manipulation de dossiers",
+        "Facilite la manipulation d'un dossier",
     ];
 
     /**
@@ -63,19 +66,9 @@ class Folder
     /**
      * Contenu du dossier
      *
-     * @var array
+     * @var Items
      */
-    private $content = [
-        'files' => [],
-        'folders' => []
-    ];
-
-    /**
-     * Instance du répertoire
-     *
-     * @var \Directory
-     */
-    private $dir;
+    private $content;
 
     /**
      * Retourne l'instance *Singleton* de cette classe.
@@ -86,7 +79,7 @@ class Folder
      *
      * @return self
      */
-    public static function getInstance($path = null)
+    public static function getInstance($path)
     {
         if (null === self::$instance || !is_null($path)) {
             self::$instance = new self($path);
@@ -101,193 +94,76 @@ class Folder
      *
      * @throws \Exception
      */
-    public function __construct($path = __DIR__)
+    public function __construct($path)
     {
-        if (is_dir($path)) {
-            $this->dir = dir($path);
-            $this->path = $path;
-        } elseif (is_file($path)) {
-            $this->dir = dir(dirname($path));
-            $this->path = $path;
-        } else {
-            throw new \Exception('Paramètre invalide');
+        $items = [];
+        if ($folder = opendir($path)) {
+            $this->path = realpath($path);
+            while (false !== ($item = readdir($folder))) {
+                if ($item !== '.' && $item !== '..') {
+                    if (is_dir($this->path(true) . $item)) {
+                        $items['folders'][] = $item;
+                    } elseif (is_file($this->path(true) . $item)) {
+                        $items['files'][] = $item;
+                    }
+                }
+            }
+            closedir($folder);
         }
+        $this->content = new Items($items);
     }
 
     /**
-     * Fermeture de l'instance \Directory.
+     * Obtenir le chemin complet
      *
-     * @return bool
+     * @param bool $withDirSep Ajoute un slash
+     *
+     * @return string
      */
-    public function __destroy()
+    public function path($withDirSep = false)
     {
-        $this->dir->close();
-        return true;
+        $path = $this->path;
+        if ($withDirSep) {
+            $path .= DIRECTORY_SEPARATOR;
+        }
+        return $path;
     }
 
     /**
-     * Est appelée pour lire des données depuis des propriétés inaccessibles.
+     * Obtenir le contenu dans une instance de <code>Items</code>
      *
-     * @param string $key Dossier ou fichier dans l'instance
-     *
-     * @return self|null
+     * @return Items
      */
-    public function __get($key)
+    public function content()
     {
-        return $this->get($key);
+        return $this->content;
     }
 
     /**
-     * Obtenir une nouvelle instance à partir d'un dossier ou fichier présent dans l'instance courante
+     * Obtenir un contenu dossier/fichier
      *
-     * @param string $name Dossier ou fichier dans l'instance
+     * @param string $name Nom d'un fichier/dossier
      *
-     * @return self|null
+     * @return null|\Rcnchris\Common\File|\Rcnchris\Common\Folder
      */
     public function get($name)
     {
-        return file_exists($this->path . DIRECTORY_SEPARATOR . $name)
-            ? new self($this->path . DIRECTORY_SEPARATOR . $name)
-            : null;
+        if ($this->content()->has('folders') && $this->content()->get('folders')->hasValue($name)) {
+            return new self($this->path() . '/' . $name);
+        } elseif ($this->content()->has('files') && $this->content()->get('files')->hasValue($name)) {
+            return new File($this->path(true) . $name);
+        }
+        return null;
     }
 
     /**
-     * Obtenir la taille du chemin de l'instance
-     *
-     * @return int|null|string
-     */
-    public function size()
-    {
-        return $this->getFileInfo($this->path)->getSize();
-    }
-
-    /**
-     * Obtenir le contenu du dossier.
-     *
-     * @param string $key 'files', 'folders' ou les deux si null
+     * Obtenir le contenu dans un tableau
      *
      * @return array
      */
-    public function content($key = null)
+    public function toArray()
     {
-        while (false !== ($entry = $this->dir->read())) {
-            $item = $this->path . DIRECTORY_SEPARATOR . $entry;
-            if (is_dir($item)) {
-                $this->content['folders'][] = $entry;
-            } elseif (is_file($item)) {
-                $this->content['files'][] = $entry;
-            }
-        }
-        sort($this->content['files']);
-        sort($this->content['folders']);
-        $this->content['folders'] = array_slice($this->content['folders'], 2);
-        return $key
-            ? $this->content[$key]
-            : $this->content;
-    }
-
-    /**
-     * Obtenir la liste des fichiers à la racine du dossier.
-     *
-     * @return mixed
-     */
-    public function files()
-    {
-        return $this->content('files');
-    }
-
-    /**
-     * Obtenir les dossiers de la racine.
-     *
-     * @return array
-     */
-    public function folders()
-    {
-        return $this->content('folders');
-    }
-
-    /**
-     * Vérifier si l'instance est un dossier
-     *
-     * @param string|null $path Chemin à vérifier
-     *
-     * @return bool
-     */
-    public function isFolder($path = null)
-    {
-        if (is_null($path)) {
-            $path = $this->path;
-        }
-        return is_dir($path);
-    }
-
-    /**
-     * Vérifier si l'instance est un fichier
-     *
-     * @param string|null $path Chemin à vérifier
-     *
-     * @return bool
-     */
-    public function isFile($path = null)
-    {
-        if (is_null($path)) {
-            $path = $this->path;
-        }
-        return is_file($path);
-    }
-
-    /**
-     * Vérifier la présence d'un fichier à la racine.
-     *
-     * @param string $name Nom du fichier
-     *
-     * @return bool
-     */
-    public function hasFile($name)
-    {
-        return in_array($name, $this->files(), true);
-    }
-
-    /**
-     * Vérifier la présence d'un dossier à la racine.
-     *
-     * @param string $name Nom du dossier
-     *
-     * @return bool
-     */
-    public function hasFolder($name)
-    {
-        return in_array($name, $this->folders(), true);
-    }
-
-    /**
-     * Obtenir la liste des extensions de l'instance
-     *
-     * @param null $name
-     *
-     * @return array
-     */
-    public function extensions($name = null)
-    {
-        $ret = [];
-        foreach ($this->files() as $file) {
-            $ret[] = substr($file, strpos($file, '.') + 1, strlen($file) - strpos($file, '.'));
-        }
-        return is_null($name)
-            ? array_unique($ret)
-            : in_array($name, $ret);
-    }
-
-    /**
-     * Obtenir les informations d'un fichier
-     *
-     * @param string $name Nom complet du fichier
-     *
-     * @return SplFileInfo
-     */
-    public function getFileInfo($name)
-    {
-        return new SplFileInfo($name);
+        return $this->content()->toArray();
     }
 
     /**
@@ -303,5 +179,27 @@ class Folder
             return join('. ', self::$help);
         }
         return self::$help;
+    }
+
+    /**
+     * (PHP 5 &gt;= 5.1.0)<br/>
+     * Count elements of an object
+     *
+     * @link http://php.net/manual/en/countable.count.php
+     * @return int The custom count as an integer.
+     *       </p>
+     *       <p>
+     *       The return value is cast to an integer.
+     */
+    public function count()
+    {
+        $count = 0;
+        if ($this->content()->has('folders')) {
+            $count = $this->content()->get('folders')->count();
+        }
+        if ($this->content()->has('files')) {
+            $count = $this->content()->get('files')->count();
+        }
+        return $count;
     }
 }

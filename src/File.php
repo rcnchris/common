@@ -5,7 +5,7 @@
  *
  * PHP version 5
  *
- * @category New
+ * @category Fichier
  *
  * @package  Rcnchris\Core\Tools
  *
@@ -20,8 +20,11 @@ namespace Rcnchris\Common;
 
 /**
  * Class File
+ * <ul>
+ * <li>Facilite la manipulation des fichiers</li>
+ * </ul>
  *
- * @category Fichiers et dossiers
+ * @category Fichier
  *
  * @package  Rcnchris\Core\Tools
  *

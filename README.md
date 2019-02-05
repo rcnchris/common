@@ -1,4 +1,7 @@
-<img src="readme.png" align="right" />
+[![GitHub tag](https://img.shields.io/github/tag/rcnchris/common.svg)]()
+[![GitHub Release Date](https://img.shields.io/github/release-date/rcnchris/common.svg)]()
+
+<img src="img/readme.png" align="right" />
 
 # Common
 > Librairies communes PHP.
@@ -8,4 +11,4 @@
 ## Installation
 
 ### Pour l'utiliser dans son projet
-<pre>composer require rcnchris/common</pre>
+    composer require rcnchris/common

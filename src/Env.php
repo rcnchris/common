@@ -5,7 +5,7 @@
  *
  * PHP version 5
  *
- * @category New
+ * @category Environnement
  *
  * @package  Rcnchris\Common
  *
@@ -20,6 +20,9 @@ namespace Rcnchris\Common;
 
 /**
  * Class Env
+ * <ul>
+ * <li>Permet d'accéder aux variables d'environnement <code>$_SERVER</code>...</li>
+ * </ul>
  *
  * @category Environnement
  *
@@ -41,12 +44,11 @@ class Env
      * @var array
      */
     private static $help = [
-        "Permet d'accéder aux variables d'environnement",
-        "Statique et instanciable via <code>getInstance</code>",
+        "Permet d'accéder aux variables d'environnement"
     ];
 
     /**
-     * Tableau `$_SERVER` dans une instance de Items
+     * Tableau <code>$_SERVER</code> dans une instance de Items
      *
      * @var Items
      */
@@ -132,7 +134,7 @@ class Env
      */
     public function getUname($opt = 'a')
     {
-        return Cmd::exec('uname -' . $opt);
+        return exec('uname -' . $opt);
     }
 
     /**
@@ -212,7 +214,7 @@ class Env
      */
     public function getWebUser()
     {
-        return Cmd::exec('whoami');
+        return exec('whoami');
     }
 
     /**
@@ -222,7 +224,7 @@ class Env
      */
     public function getMysqlVersion()
     {
-        return Cmd::exec('mysql -V');
+        return exec('mysql -V');
     }
 
     /**
@@ -292,7 +294,7 @@ class Env
      */
     public function getPhpModules()
     {
-        $modules = Cmd::exec('php -m');
+        $modules = (new Cmd('php -m'))->exec();
         array_shift($modules);
         $modules = array_filter($modules);
         return $this->makeItems($modules);
@@ -402,7 +404,7 @@ class Env
      */
     public function getGitVersion($short = false)
     {
-        $version = Cmd::exec('git --version');
+        $version = exec('git --version');
         return $short ? trim(str_replace('git version', '', $version)) : $version;
     }
 
@@ -426,7 +428,7 @@ class Env
      */
     public function getComposerVersion()
     {
-        return Cmd::exec('composer -V');
+        return exec('composer -V');
     }
 
     /**
@@ -437,7 +439,7 @@ class Env
      */
     public function getWkhtmltopdfVersion()
     {
-        return Cmd::exec('wkhtmltopdf -V');
+        return exec('wkhtmltopdf -V');
     }
 
     /**

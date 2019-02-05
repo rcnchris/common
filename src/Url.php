@@ -5,7 +5,7 @@
  *
  * PHP version 5
  *
- * @category New
+ * @category URL
  *
  * @package  Rcnchris\Common
  *
@@ -20,6 +20,9 @@ namespace Rcnchris\Common;
 
 /**
  * Class Url
+ * <ul>
+ * <li>Facilite la manipulation des URL</li>
+ * </ul>
  *
  * @category URL
  *

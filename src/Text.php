@@ -5,7 +5,7 @@
  *
  * PHP version 5
  *
- * @category New
+ * @category Texte
  *
  * @package  Rcnchris\Common
  *
@@ -18,10 +18,15 @@
 
 namespace Rcnchris\Common;
 
+use Michelf\MarkdownExtra;
+
 /**
  * Class Text
+ * <ul>
+ * <li>Facilite la manipulation des chaînes de caractères</li>
+ * </ul>
  *
- * @category New
+ * @category Texte
  *
  * @package  Rcnchris\Common
  *
@@ -191,5 +196,17 @@ class Text
     {
         $content = highlight_string("<?php " . $source . " ?>", true);
         return $content;
+    }
+
+    /**
+     * Obtenir du HTML à partir de Markdown
+     *
+     * @param string $content Contenu en <code>Markdown</code>
+     *
+     * @return string
+     */
+    public static function markdown($content)
+    {
+        return MarkdownExtra::defaultTransform($content);
     }
 }

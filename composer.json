@@ -1,7 +1,19 @@
 {
   "name": "rcnchris/common",
   "description": "Outils divers",
-  "keywords": ["library","php","collection","items","liste"],
+  "keywords": [
+    "library",
+    "php",
+    "shell",
+    "debug",
+    "environnement",
+    "fichier",
+    "folder",
+    "items",
+    "myvar",
+    "texte",
+    "url"
+  ],
   "authors": [
     {
       "name": "rcnchris",
@@ -12,10 +24,11 @@
   "support": {
     "email": "rcn.chris@gmail.com",
     "source": "https://github.com/rcnchris/common",
-    "issues": "https://github.com/rcnchris/common/issues",
-    "wiki": "https://github.com/rcnchris/common/wiki"
+    "issues": "https://github.com/rcnchris/common/issues"
   },
-  "require": {},
+  "require": {
+    "michelf/php-markdown": "^1.8"
+  },
   "require-dev": {
     "digitalnature/php-ref": "^1.2",
     "phpunit/phpunit": ">=4.8 < 6.0",

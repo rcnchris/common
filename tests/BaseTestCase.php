@@ -179,13 +179,24 @@ class BaseTestCase extends TestCase
         }
     }
 
-
-
     public function assertHasHelp($o)
     {
         $this->assertObjectHasAttribute('help', $o);
         $this->assertObjectHasMethods($o, ['help']);
         $this->assertInternalType('string', $o->help());
         $this->assertInternalType('array', $o->help(false));
+    }
+
+    /**
+     * Vérifie la présene d'une liste de clés dans un tableau
+     *
+     * @param array $keys  Liste des clés à vérifier
+     * @param array $array Tableau à vérifier
+     */
+    public function assertArrayHasKeys(array $keys, array $array)
+    {
+        foreach ($keys as $key) {
+            $this->assertArrayHasKey($key, $array, "La clé $key n'existe pas dans le tableau");
+        }
     }
 }

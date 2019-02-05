@@ -5,7 +5,7 @@
  *
  * PHP version 5
  *
- * @category New
+ * @category Debug
  *
  * @package  Rcnchris\Common
  *
@@ -20,8 +20,12 @@ namespace Rcnchris\Common;
 
 /**
  * Class Debug
+ * <ul>
+ * <li>Fournit des méthodes de debug</li>
+ * <li>Toutes les méthodes qui peuvent retourner des listes, retournent une instance de <code>Items</code></li>
+ * </ul>
  *
- * @category New
+ * @category Debug
  *
  * @package  Rcnchris\Common
  *
@@ -42,7 +46,6 @@ class Debug
      */
     private static $help = [
         'Fournit des méthodes de debug',
-        'Instanciable et statique',
         'Toutes les méthodes qui peuvent retourner des listes, retournent une instance de <code>Items</code>'
     ];
 
