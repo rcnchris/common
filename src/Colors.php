@@ -7,7 +7,7 @@
  *
  * @category Couleurs
  *
- * @package  Core\Colors
+ * @package  Rcnchris\Common
  *
  * @author   Raoul <rcn.chris@gmail.com>
  *
@@ -33,13 +33,14 @@ use Traversable;
  *
  * @category Couleurs
  *
- * @package  Core\Colors
+ * @package  Rcnchris\Common
  *
  * @author   Raoul <rcn.chris@gmail.com>
  *
  * @license  https://github.com/rcnchris GPL
  *
  * @version  Release: <1.0.0>
+ * @since    Release: <1.0.2>
  *
  * @link     https://github.com/rcnchris on Github
  */
@@ -286,8 +287,8 @@ class Colors implements Countable, ArrayAccess, IteratorAggregate
      * ### Exemple
      * - `$colors->colorToRgb('#45EF4B');`
      *
-     * @param string $hexa Code héxadécimal sur 7 caractères
-     * @param bool|null   $tostring Si vrai, retourne une chaîne de cractères : rgb(0, 0, 0)
+     * @param string    $hexa     Code héxadécimal sur 7 caractères
+     * @param bool|null $tostring Si vrai, retourne une chaîne de cractères : rgb(0, 0, 0)
      *
      * @return array
      * @throws \Exception

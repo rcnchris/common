@@ -26,7 +26,8 @@
     "issues": "https://github.com/rcnchris/common/issues"
   },
   "require": {
-    "michelf/php-markdown": "^1.8"
+    "michelf/php-markdown": "^1.8",
+    "intervention/image": "^2.4"
   },
   "require-dev": {
     "digitalnature/php-ref": "^1.2",
