@@ -46,8 +46,7 @@ class Text
      * @var array
      */
     private static $help = [
-        'Facilite la manipulations des chaînes de caractères',
-        'Statique et instanciable via <code>getInstance()</code>',
+        'Facilite la manipulations des chaînes de caractères'
     ];
 
     /**

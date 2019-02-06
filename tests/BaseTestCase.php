@@ -48,6 +48,16 @@ class BaseTestCase extends TestCase
     ];
 
     /**
+     * Nom des méthodes magiques de PHP
+     *
+     * @var array
+     */
+    protected $magicMethods = [
+        '__get',
+        '__call'
+    ];
+
+    /**
      * Affiche un titre coloré dans la console
      *
      * @param string $titre Titre
@@ -119,33 +129,69 @@ class BaseTestCase extends TestCase
     }
 
     /**
+     * Vérifier qu'un objet implémente l'interface Countable
+     *
+     * @param object $object Objet à instance de l'objet à vérifier
+     * @param int    $count  Valeur attendue
+     */
+    protected function assertImplementCountable($object, $count)
+    {
+        $interfaceName = 'Countable';
+        $class = get_class($object);
+
+        $this->assertArrayHasKey(
+            $interfaceName,
+            class_implements($object),
+            "L'instance de $class n'implémente pas l'interface $interfaceName"
+        );
+        $this->assertObjectHasMethods($object, ['count']);
+        $this->assertEquals($count, $object->count());
+    }
+
+    /**
+     * Vérifier qu'un objet implémente l'interface IteratorAggregate
+     *
+     * @param object $object Objet à vérifier
+     */
+    protected function assertImplementIteratorAggregate($object)
+    {
+        $interfaceName = 'IteratorAggregate';
+        $class = get_class($object);
+
+        $this->assertArrayHasKey(
+            $interfaceName,
+            class_implements($object),
+            "L'instance de $class n'implémente pas l'interface $interfaceName"
+        );
+        $this->assertObjectHasMethods($object, ['getIterator']);
+        $tab = [];
+        foreach ($object as $k => $v) {
+            $tab[$k] = $v;
+        }
+    }
+
+    /**
      * Vérifie le comportement d'un objet qui implémente ArrayAccess
      *
      * ### Exemple
-     * - `$this->assertArrayAccess($result, 1, ['id' => 2, 'title' => 'Page'], ['Exists', 'Get']);`
+     * - `$this->assertImplementArrayAccess($result, 1, ['id' => 2, 'title' => 'Page'], ['Exists', 'Get']);`
      *
-     * @param object     $object  Instance de l'objet à tester
-     * @param string     $key     Nom d'une clé du tableau
-     * @param mixed      $expect  Valeur attendue
-     * @param array|null $methods Liste des méthodes à tester
+     * @param object $object Instance de l'objet à tester
+     * @param string $key    Nom d'une clé du tableau
+     * @param mixed  $expect Valeur attendue
      */
-    protected function assertArrayAccess($object, $key, $expect, array $methods = [])
+    protected function assertImplementArrayAccess($object, $key, $expect)
     {
         $interfaceName = 'ArrayAccess';
         $class = get_class($object);
 
         $this->assertArrayHasKey(
-            $interfaceName, class_implements($object),
+            $interfaceName,
+            class_implements($object),
             "L'instance de $class n'implémente pas l'interface $interfaceName"
         );
 
-        if (empty($methods)) {
-            $methods = $this->mapMethodsInterfaces[$interfaceName];
-        } else {
-            $methods = array_map(function ($method) {
-                return 'offset' . ucfirst($method);
-            }, $methods);
-        }
+        $methods = $this->mapMethodsInterfaces[$interfaceName];
 
         foreach ($methods as $method) {
             if ($method === 'offsetExists') {

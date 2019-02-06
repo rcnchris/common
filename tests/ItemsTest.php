@@ -650,6 +650,6 @@ class ItemsTest extends BaseTestCase
             'year' => 2007
         ];
         $items = $this->makeItems($a);
-        $this->assertArrayAccess($items, 'name', 'Mathis');
+        $this->assertImplementArrayAccess($items, 'name', 'Mathis');
     }
 }
