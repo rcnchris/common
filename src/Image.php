@@ -89,7 +89,7 @@ class Image
      *
      * @param string|\Intervention\Image\Image $source Source de l'image
      *
-     * @return $this
+     * @return self
      * @throws \Exception
      */
     public function setSource($source)
@@ -98,7 +98,7 @@ class Image
             throw new \Exception("La source de l'image est vide");
         } elseif (is_string($source)) {
             $this->img = ImageManagerStatic::make($source);
-        } elseif ($source instanceof \Intervention\Image\Image) {
+        } elseif ($source instanceof Image) {
             $this->img = $source;
         }
         return $this;
@@ -228,6 +228,13 @@ class Image
         return $this->img->__toString();
     }
 
+    /**
+     * Obtenir le code HTML pour afficher l'image
+     *
+     * @param string $alt Valeur de l'attribut 'alt'
+     *
+     * @return string
+     */
     public function html($alt = 'Image')
     {
         $html = '<img src="' . $this->getEncode() . '" alt="' . $alt . '">';
