@@ -34,7 +34,7 @@ class ImageTest extends BaseTestCase
     public function setUp()
     {
         parent::setUp();
-        $this->dirPath = __DIR__ . '/img';
+        $this->dirPath = $this->pathFiles . '/img';
         $this->imgDir = dir($this->dirPath);
         $this->files = [];
         while (false !== ($item = $this->imgDir->read())) {
@@ -65,7 +65,7 @@ class ImageTest extends BaseTestCase
 
     public function testInstanceWithPathFile()
     {
-        $file = __DIR__ . '/img/bob_marley_santa-barbara79.jpg';
+        $file = $this->pathFiles . '/img/bob_marley_santa-barbara79.jpg';
         $img = $this->makeImage($file);
         $this->assertInstanceOf(Image::class, $img);
         $this->assertEquals(
@@ -77,7 +77,7 @@ class ImageTest extends BaseTestCase
 
     public function testInstanceWithObject()
     {
-        $file = __DIR__ . '/img/bob_marley_santa-barbara79.jpg';
+        $file = $this->pathFiles . '/img/bob_marley_santa-barbara79.jpg';
         $img = $this->makeImage($file);
         $this->assertInstanceOf(Image::class, $this->makeImage($img));
         $this->assertEquals(
@@ -102,7 +102,7 @@ class ImageTest extends BaseTestCase
     public function testGetDirname()
     {
         $this->assertEquals(
-            __DIR__ . '/img', $this->img->getDirname(),
+            $this->pathFiles . '/img', $this->img->getDirname(),
             "Le chemin de l'image n'est pas celui attendu"
         );
     }
@@ -199,7 +199,9 @@ class ImageTest extends BaseTestCase
 
     public function testMakeThumb()
     {
-        $thumb = $this->img->makeThumb();
+        $file = $this->pathFiles . '/img/CamarroSS.gif';
+        $img = $this->makeImage($file);
+        $thumb = $img->makeThumb();
         $this->assertInstanceOf(
             Image::class,
             $thumb,
@@ -214,7 +216,7 @@ class ImageTest extends BaseTestCase
 
     public function testSave()
     {
-        $newFile = __DIR__ . '/img/save_' . $this->img->getBasename();
+        $newFile = $this->pathFiles . '/img/save_' . $this->img->getBasename();
         $newImg = $this->img->save($newFile);
         $this->assertInstanceOf(
             Image::class,
@@ -222,6 +224,7 @@ class ImageTest extends BaseTestCase
             "L'objet attendu est incorrect"
         );
         $this->assertTrue(file_exists($newFile));
+        unlink($newFile);
     }
 
     public function testHtml()

@@ -215,7 +215,6 @@ class Curl
         return $url === filter_var($url, FILTER_VALIDATE_URL);
     }
 
-
     /**
      * Obtenir les paramètres de la requête cURL
      *
@@ -385,7 +384,6 @@ class Curl
         ]);
     }
 
-
     /**
      * Obtenir le journal des requêtes exécutées
      *
@@ -422,12 +420,89 @@ class Curl
     }
 
     /**
-     * Obtenir la réponse brute
+     * Obtenir la réponse
      *
      * @return mixed
      */
     public function getResponse()
     {
         return $this->response;
+    }
+
+    /**
+     * Obtenir l'URL courante de l'API
+     *
+     * @return string|null
+     */
+    public function getContentType()
+    {
+        $contentType = explode(';', $this->getInfos('content_type'));
+        return current($contentType);
+    }
+
+    /**
+     * Obtenir la réponse dans un objet selon le content-type de la réponse
+     *
+     * @return mixed|null|\Rcnchris\Common\Image|\Rcnchris\Common\Items|\SimpleXMLElement
+     */
+    public function toObject()
+    {
+        $type = $this->getContentType();
+        $o = null;
+        $errors = [
+            'code' => $this->getInfos('http_code'),
+            'type' => $type,
+            'infos' => $this->getInfos(),
+            'response' => $this->response,
+            'curlError' => curl_error($this->curl),
+            'curlErrorCode' => curl_errno($this->curl)
+        ];
+        if ($type === 'text/html') {
+            $o = $this->response;
+        } elseif ($type === 'application/json') {
+            $content = json_decode($this->response, true);
+            $o = is_array($content)
+                ? new Items($content)
+                : new Items(array_merge(
+                    $errors,
+                    ['jsonError' => json_last_error(), 'jsonErrorMsg' => json_last_error_msg()]
+                ));
+        } elseif ($type === 'text/csv') {
+            // Chaque ligne dans un tableau
+            $array = str_getcsv($this->response, "\n");
+
+            // Extraction des entêtes de colonnes
+            $headers = str_getcsv($array[0]);
+            unset($array[0]);
+
+            // Traitement des lignes
+            $rows = [];
+            foreach ($array as $indLine => $row) {
+                foreach (str_getcsv($row) as $indCol => $value) {
+                    if (isset($headers[$indCol])) {
+                        $rows[$indLine][$headers[$indCol]] = $value;
+                    }
+                }
+            }
+            $o = new Items($rows);
+        } elseif (in_array($type, ['application/xml', 'text/xml'])) {
+            libxml_use_internal_errors(true);
+            $o = simplexml_load_string($this->response);
+            if ($o === false) {
+                $xmlErrors = [];
+                foreach (libxml_get_errors() as $e) {
+                    $xmlErrors[] = [
+                        'code' => $e->code,
+                        'line' => $e->line,
+                        'column' => $e->column,
+                        'msg' => $e->message,
+                    ];
+                }
+                $o = new Items(array_merge($errors, compact('xmlErrors')));
+            }
+        } elseif (in_array($type, ['image/jpeg'])) {
+            $o = new Image($this->getUrl());
+        }
+        return $o;
     }
 }

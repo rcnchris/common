@@ -1,40 +1,25 @@
 <?php
-/**
- * Fichier BaseTestCase.php du 25/01/2019
- * Description : Fichier de la classe BaseTestCase
- *
- * PHP version 5
- *
- * @category New
- *
- *
- * @author   Raoul <rcn.chris@gmail.com>
- *
- * @license  https://github.com/rcnchris GPL
- *
- * @link     https://github.com/rcnchris On Github
- */
 namespace Tests\Rcnchris\Common;
 
 use PHPUnit\Framework\TestCase;
 
-
-/**
- * Class BaseTestCase
- *
- * @category New
- *
- *
- * @author   Raoul <rcn.chris@gmail.com>
- *
- * @license  https://github.com/rcnchris GPL
- *
- * @version  Release: <1.0.0>
- *
- * @link     https://github.com/rcnchris on Github
- */
 class BaseTestCase extends TestCase
 {
+    /**
+     * Affichage console bavard
+     * 0 : Rien
+     * 1 : Les titres
+     * 2 : Les titres et les infos
+     */
+    const VERBOSE = 2;
+
+    /**
+     * Chemin des fichiers de tests
+     *
+     * @var string
+     */
+    protected $pathFiles = __DIR__ . '/files';
+
     /**
      * Mapping des interfaces et leur méthodes
      *
@@ -62,9 +47,14 @@ class BaseTestCase extends TestCase
      *
      * @param string $titre Titre
      * @param bool   $isTest
+     *
+     * @return void
      */
     protected function ekoTitre($titre = '', $isTest = false)
     {
+        if ($this::VERBOSE < 1) {
+            return null;
+        }
         $methods = get_class_methods(get_class($this));
         $tests = array_map(function ($method) {
             return substr($method, 0, 4) === 'test' ? $method : null;
@@ -75,6 +65,21 @@ class BaseTestCase extends TestCase
         }
         $parts = explode(' - ', $titre);
         echo "\n\033[0;36m{$parts[0]}\033[m - {$parts[1]} (\033[0;32m$tests\033[m)\n";
+    }
+
+    /**
+     * Affiche un message d'information à la console
+     *
+     * @param string $content Contenu du message
+     *
+     * @return void
+     */
+    protected function ekoInfo($content)
+    {
+        if ($this::VERBOSE < 2) {
+            return null;
+        }
+        echo "\n\033[0;35m{$content}\033[m \n";
     }
 
     /**
@@ -138,7 +143,7 @@ class BaseTestCase extends TestCase
     {
         $interfaceName = 'Countable';
         $class = get_class($object);
-
+        $this->ekoInfo($class . " implémente Countable");
         $this->assertArrayHasKey(
             $interfaceName,
             class_implements($object),
@@ -157,7 +162,7 @@ class BaseTestCase extends TestCase
     {
         $interfaceName = 'IteratorAggregate';
         $class = get_class($object);
-
+        $this->ekoInfo($class . " implémente IteratorAggregate");
         $this->assertArrayHasKey(
             $interfaceName,
             class_implements($object),
@@ -184,6 +189,7 @@ class BaseTestCase extends TestCase
     {
         $interfaceName = 'ArrayAccess';
         $class = get_class($object);
+        $this->ekoInfo($class . " implémente ArrayAccess");
 
         $this->assertArrayHasKey(
             $interfaceName,
@@ -225,8 +231,14 @@ class BaseTestCase extends TestCase
         }
     }
 
+    /**
+     * Vérifie la présence et le fonctionnement de la méthode Help d'un objet
+     *
+     * @param object $o Objet à vérifier
+     */
     public function assertHasHelp($o)
     {
+        $this->ekoInfo(get_class($o) . " possède la méthode 'help'");
         $this->assertObjectHasAttribute('help', $o);
         $this->assertObjectHasMethods($o, ['help']);
         $this->assertInternalType('string', $o->help());

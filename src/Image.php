@@ -89,7 +89,7 @@ class Image
      *
      * @param string|\Intervention\Image\Image $source Source de l'image
      *
-     * @return self
+     * @return $this
      * @throws \Exception
      */
     public function setSource($source)
@@ -98,7 +98,7 @@ class Image
             throw new \Exception("La source de l'image est vide");
         } elseif (is_string($source)) {
             $this->img = ImageManagerStatic::make($source);
-        } elseif ($source instanceof Image) {
+        } elseif ($source instanceof \Intervention\Image\Image) {
             $this->img = $source;
         }
         return $this;
@@ -256,7 +256,6 @@ class Image
     public function makeThumb($size = 150)
     {
         $img = clone($this->img);
-        // $fileName = $this->getDirname() . '/thumb_' . $this->getBasename();
         return new self($img
             ->orientate()
             ->interlace()
